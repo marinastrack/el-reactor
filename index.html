@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room: El Reactor en Cuenta Regresiva</title>
+    <!-- Tailwind CSS para el diseño rápido y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons para una interfaz moderna -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Configuración e Integración de MathJax para renderizar LaTeX sin mostrar los signos de dólar -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        console.log('MathJax inicializado con éxito');
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+        
+        .font-mono-tech {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .font-cyber {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Animaciones para la inmersión de ciencia ficción */
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .alert-pulse {
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 12s linear infinite;
+        }
+
+        @keyframes spin-reverse-slow {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        .animate-spin-reverse-slow {
+            animation: spin-reverse-slow 8s linear infinite;
+        }
+        
+        /* Estilos personalizados para las transiciones de las misiones */
+        .mission-card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #1e293b;
+            transition: all 0.3s ease;
+        }
+        .mission-active {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .mission-completed {
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Ajustes de renderizado para fórmulas MathJax en modo oscuro */
+        mjx-container {
+            color: #f1f5f9 !important;
+            display: inline-block;
+            margin: 0 2px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-mono-tech selection:bg-red-500 selection:text-white">
+
+    <!-- Header / Sistema de Alerta Superior con Reactor SVG Animado -->
+    <header class="border-b border-red-900 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                
+                <!-- Ilustración Vectorial del Reactor Inestable Activo (Siempre Visible) -->
+                <div class="relative w-16 h-16 flex-shrink-0 bg-slate-950 rounded-full border border-red-900/40 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.15)]">
+                    <!-- Elemento SVG del Reactor -->
+                    <svg class="absolute w-full h-full top-0 left-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="reactor-glow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ef4444" stop-opacity="1" />
+                                <stop offset="50%" stop-color="#b91c1c" stop-opacity="0.6" />
+                                <stop offset="100%" stop-color="#020617" stop-opacity="0" />
+                            </radialGradient>
+                        </defs>
+                        <!-- Fondo brillante -->
+                        <circle cx="50" cy="50" r="24" fill="url(#reactor-glow)" class="animate-pulse" />
+                        
+                        <!-- Anillo Exterior Giratorio (Sentido horario) -->
+                        <g class="origin-[50px_50px] animate-spin-slow">
+                            <circle cx="50" cy="50" r="42" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="12 8 4 8" fill="none" class="opacity-80" />
+                            <circle cx="50" cy="50" r="36" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2 6" fill="none" class="opacity-60" />
+                        </g>
+                        
+                        <!-- Anillo Interior de Contención (Sentido antihorario) -->
+                        <g class="origin-[50px_50px] animate-spin-reverse-slow">
+                            <circle cx="50" cy="50" r="30" stroke="#3b82f6" stroke-width="2" stroke-dasharray="25 10 5 10" fill="none" class="opacity-90" />
+                        </g>
+
+                        <!-- Estructuras de Núcleo Magnético -->
+                        <line x1="50" y1="8" x2="50" y2="20" stroke="#7f1d1d" stroke-width="2" />
+                        <line x1="50" y1="80" x2="50" y2="92" stroke="#7f1d1d" stroke-width="2" />
+                        <line x1="8" y1="50" x2="20" y2="50" stroke="#7f1d1d" stroke-width="2" />
+                        <line x1="80" y1="50" x2="92" y2="50" stroke="#7f1d1d" stroke-width="2" />
+                    </svg>
+                    <!-- Núcleo de Energía Parpadeante -->
+                    <div class="w-4 h-4 bg-red-500 rounded-full animate-ping absolute"></div>
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full relative z-10 shadow-[0_0_8px_#f59e0b]"></div>
+                </div>
+
+                <div>
+                    <h1 class="text-xl font-bold font-cyber tracking-wider text-red-500 flex items-center gap-2">
+                        <i data-lucide="shield-alert" class="w-5 h-5 alert-pulse"></i> REACTOR PRINCIPAL: INESTABLE
+                    </h1>
+                    <p class="text-xs text-slate-400">PROTOCOLO DE SEGURIDAD DEL DR. ALBERT CONSTANT</p>
+                </div>
+            </div>
+            
+            <!-- Cronómetro de Cuenta Regresiva -->
+            <div class="flex items-center gap-3 bg-red-950/40 border border-red-500/30 px-4 py-2 rounded-lg">
+                <i data-lucide="timer" class="w-6 h-6 text-red-500 alert-pulse"></i>
+                <div class="text-center">
+                    <span class="text-xs text-red-400 block tracking-widest font-cyber">TIEMPO PARA EL IMPACTO</span>
+                    <span id="countdown" class="text-2xl font-bold text-red-500 font-cyber tracking-widest">20:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-6xl w-full mx-auto p-4 flex-grow flex flex-col justify-center">
+        
+        <!-- PANTALLA DE BIENVENIDA / INICIO -->
+        <section id="screen-intro" class="mission-card rounded-xl p-6 md:p-10 max-w-2xl mx-auto shadow-2xl border-red-900/50">
+            <div class="text-center mb-6">
+                <div class="inline-flex p-4 bg-red-950/50 rounded-full border border-red-500/30 mb-4">
+                    <i data-lucide="radiation" class="w-16 h-16 text-red-500 alert-pulse"></i>
+                </div>
+                <h2 class="text-3xl font-cyber font-black tracking-tight text-white mb-2">OPERACIÓN: PUNTO CRÍTICO</h2>
+                <div class="h-1 w-20 bg-red-600 mx-auto rounded"></div>
+            </div>
+            
+            <div class="space-y-4 text-slate-300 text-sm md:text-base leading-relaxed">
+                <p>
+                    ¡Atención equipo de ingenieros! El reactor de fusión fría del laboratorio ha entrado en un bucle de sobrecarga. El Dr. Albert Constant ha desaparecido, pero dejó su bitácora protegida con sistemas de seguridad basados en <span class="text-yellow-400 font-bold">leyes de proporcionalidad física</span>.
+                </p>
+                <p>
+                    Tienen exactamente <span class="text-red-400 font-bold">20 minutos</span> para resolver los sistemas de calibración de las cuatro misiones antes de que la temperatura del núcleo alcance el punto de no retorno.
+                </p>
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 space-y-2 text-xs">
+                    <span class="text-blue-400 font-bold uppercase tracking-wider block">Reglas de Operación:</span>
+                    <ul class="list-disc pl-5 space-y-1 text-slate-400">
+                        <li>Deberán resolver los desafíos de forma secuencial.</li>
+                        <li>Cada misión requiere identificar si la relación es <strong>Directa</strong> o <strong>Inversa</strong>.</li>
+                        <li>¡Registren las constantes de proporcionalidad! Serán vitales para el código de desactivación final.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button onclick="startGame()" class="px-8 py-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-cyber font-bold rounded-lg tracking-widest transition-all shadow-[0_4px_20px_rgba(220,38,38,0.4)] hover:shadow-[0_4px_25px_rgba(220,38,38,0.6)] w-full sm:w-auto">
+                    INICIAR SECUENCIA DE APAGADO
+                </button>
+            </div>
+        </section>
+
+        <!-- PANEL DE CONTROL DEL ESCAPE ROOM (PANTALLA DE JUEGO) -->
+        <section id="screen-game" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
+            
+            <!-- Columna Izquierda: Mapa de Misiones y Estado -->
+            <div class="space-y-4 lg:col-span-1">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                    <h3 class="text-sm font-cyber text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">Estado de Misiones</h3>
+                    
+                    <div class="space-y-3">
+                        <!-- Misión 1 Status -->
+                        <div id="status-m1" class="flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-blue-500/30">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-950 text-blue-400 border border-blue-500/40 font-cyber">1</div>
+                            <div class="flex-grow">
+                                <span class="text-xs text-slate-400 block font-cyber">FASE I</span>
+                                <span class="text-sm font-bold text-blue-400">Escudo de Absurdio</span>
+                            </div>
+                            <i id="icon-m1" data-lucide="lock" class="w-5 h-5 text-slate-500"></i>
+                        </div>
+
+                        <!-- Misión 2 Status -->
+                        <div id="status-m2" class="flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-slate-800 opacity-60">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-900 text-slate-400 border border-slate-800 font-cyber">2</div>
+                            <div class="flex-grow">
+                                <span class="text-xs text-slate-400 block font-cyber">FASE II</span>
+                                <span class="text-sm font-bold text-slate-300">Válvulas de Extracción</span>
+                            </div>
+                            <i id="icon-m2" data-lucide="lock" class="w-5 h-5 text-slate-500"></i>
+                        </div>
+
+                        <!-- Misión 3 Status -->
+                        <div id="status-m3" class="flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-slate-800 opacity-60">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-900 text-slate-400 border border-slate-800 font-cyber">3</div>
+                            <div class="flex-grow">
+                                <span class="text-xs text-slate-400 block font-cyber">FASE III</span>
+                                <span class="text-sm font-bold text-slate-300">Láser de Enfoque</span>
+                            </div>
+                            <i id="icon-m3" data-lucide="lock" class="w-5 h-5 text-slate-500"></i>
+                        </div>
+
+                        <!-- Misión 4 Status -->
+                        <div id="status-m4" class="flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-slate-800 opacity-60">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-900 text-slate-400 border border-slate-800 font-cyber">4</div>
+                            <div class="flex-grow">
+                                <span class="text-xs text-slate-400 block font-cyber">FASE IV</span>
+                                <span class="text-sm font-bold text-slate-300">Bombas de Refrigeración</span>
+                            </div>
+                            <i id="icon-m4" data-lucide="lock" class="w-5 h-5 text-slate-500"></i>
+                        </div>
+
+                        <!-- Misión 5 Status -->
+                        <div id="status-m5" class="flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-slate-800 opacity-60">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-900 text-slate-400 border border-slate-800 font-cyber">5</div>
+                            <div class="flex-grow">
+                                <span class="text-xs text-slate-400 block font-cyber">FASE FINAL</span>
+                                <span class="text-sm font-bold text-slate-300">Desactivación Nuclear</span>
+                            </div>
+                            <i id="icon-m5" data-lucide="lock" class="w-5 h-5 text-slate-500"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Libreta de notas digitales del Dr. Constant -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                    <h3 class="text-sm font-cyber text-yellow-500 uppercase tracking-widest mb-3 flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <i data-lucide="notebook" class="w-4 h-4"></i> Bitácora del Dr. Constant
+                    </h3>
+                    <div class="space-y-3 text-xs text-slate-400 leading-relaxed max-h-64 overflow-y-auto pr-1">
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                            <p class="font-bold text-slate-300 mb-1">Nota #42 - El Escudo de Absurdio</p>
+                            <p>"Para alimentar el escudo electromagnético del núcleo, la relación de energía es estable. He verificado que <span class="text-blue-400 font-bold">4 gramos</span> de Absurdio mantienen el escudo activo por exactamente <span class="text-blue-400 font-bold">12 minutos</span>. Si el tiempo requerido cambia, se debe recalcular la cantidad exacta de masa. Más tiempo de escudo requerirá proporcionalmente más masa..."</p>
+                        </div>
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                            <p class="font-bold text-slate-300 mb-1">Nota #43 - Extractor de Gases</p>
+                            <p>"El sistema de ventilación de emergencia es delicado. Si abro solo <span class="text-emerald-400 font-bold">3 válvulas</span> de vacío, la nube radioactiva se disipa en <span class="text-emerald-400 font-bold">40 minutos</span>. Conectar más válvulas aumentará la velocidad de succión de manera inversamente proporcional."</p>
+                        </div>
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                            <p class="font-bold text-slate-300 mb-1">Nota #44 - El Láser de Enfoque</p>
+                            <p>"La coherencia del haz óptico es crítica. El manual del fabricante especifica que un ancho de pulso de exactamente <span class="text-purple-400 font-bold">2.5 ms</span> genera <span class="text-purple-400 font-bold">80 microjulios</span> de energía. La energía es directamente proporcional al ancho de pulso."</p>
+                        </div>
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                            <p class="font-bold text-slate-300 mb-1">Nota #45 - Bombas de Refrigeración</p>
+                            <p>"He calculado que con <span class="text-orange-400 font-bold">6 bombas activas</span> el núcleo tarda exactamente <span class="text-orange-400 font-bold">15 minutos</span> en enfriarse. Si usamos más bombas, el tiempo de enfriamiento bajará de forma inversamente proporcional."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha/Centro: Misión Activa -->
+            <div class="lg:col-span-2 flex flex-col justify-between">
+                
+                <!-- CONTENEDOR DE LAS MISIONES -->
+                <div class="flex-grow">
+                    
+                    <!-- FASE I: ESCUDO DE ABSURDIO -->
+                    <div id="pane-m1" class="mission-card rounded-xl p-6 h-full flex flex-col justify-between mission-active">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-blue-950 text-blue-400 text-xs font-cyber border border-blue-500/30 rounded-full font-bold uppercase tracking-wider">Fase I: Proporcionalidad Directa</span>
+                                <span class="text-xs text-slate-400">OBJETIVO: CALIBRAR ESCUDO</span>
+                            </div>
+                            
+                            <h2 class="text-2xl font-cyber text-white font-bold mb-3">El Escudo de Absurdio</h2>
+                            <p class="text-sm text-slate-300 mb-4">
+                                El reactor necesita desplegar un escudo de energía durante exactamente <strong class="text-yellow-400 font-cyber">27 minutos</strong> para permitirnos acceder a la siguiente fase sin recibir radiación. Debes colocar en la balanza la cantidad exacta de gramos de Absurdio para este intervalo de tiempo.
+                            </p>
+
+                            <!-- Zona de Cálculo mental para estudiantes -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/50 p-4 rounded-lg border border-slate-800 mb-6 text-sm">
+                                <div>
+                                    <span class="text-xs text-slate-400 block uppercase">Fórmula de apoyo:</span>
+                                    <p class="font-bold text-slate-300 text-slate-100 mb-1">Si $y$ (tiempo) es Directamente Proporcional a $x$ (masa):</p>
+                                    <p class="text-yellow-500 font-bold text-lg mt-1">$y = k \cdot x$ &nbsp;&nbsp; o &nbsp;&nbsp; $k = \frac{y}{x}$</p>
+                                </div>
+                                <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-4 flex flex-col justify-center">
+                                    <span class="text-xs text-slate-400 block uppercase">Datos conocidos:</span>
+                                    <p class="text-slate-300 font-semibold">Masa ($x_1$) = 4 g &rarr; Tiempo ($y_1$) = 12 min</p>
+                                    <p class="text-blue-400 font-semibold">¿Masa ($x_2$) = ? &rarr; Tiempo ($y_2$) = 27 min</p>
+                                </div>
+                            </div>
+
+                            <!-- Simulador Interactivo: Balanza de Minerales -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row gap-6 items-center justify-around">
+                                <!-- Minerales Disponibles -->
+                                <div class="text-center w-full md:w-1/2">
+                                    <span class="text-xs text-slate-400 block mb-3 uppercase tracking-wider">Gemas de Absurdio disponibles:</span>
+                                    <div class="flex flex-wrap justify-center gap-3">
+                                        <button onclick="addMineral(1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-blue-500/30 rounded-lg text-sm text-blue-300 flex items-center gap-1 transition">
+                                            <i data-lucide="gem" class="w-4 h-4"></i> +1g
+                                        </button>
+                                        <button onclick="addMineral(5)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-blue-500/30 rounded-lg text-sm text-blue-300 flex items-center gap-1 transition">
+                                            <i data-lucide="gem" class="w-4 h-4"></i> +5g
+                                        </button>
+                                        <button onclick="addMineral(0.5)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-blue-500/30 rounded-lg text-sm text-blue-300 flex items-center gap-1 transition">
+                                            <i data-lucide="gem" class="w-4 h-4"></i> +0.5g
+                                        </button>
+                                        <button onclick="clearMinerals()" class="px-3 py-2 bg-red-950/40 hover:bg-red-900/40 border border-red-500/30 rounded-lg text-sm text-red-300 flex items-center gap-1 transition">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i> Vaciar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Balanza Digital -->
+                                <div class="bg-slate-900 p-4 rounded-lg border-2 border-slate-800 w-full md:w-2/5 flex flex-col items-center shadow-inner">
+                                    <i data-lucide="scale" class="w-8 h-8 text-slate-500 mb-1"></i>
+                                    <span class="text-xs text-slate-400 block uppercase">Balanza de Carga</span>
+                                    <div class="text-3xl font-cyber font-bold text-blue-400 my-2" id="scale-display">
+                                        0.00 <span class="text-sm">g</span>
+                                    </div>
+                                    <div class="text-xs text-slate-500">
+                                        Masa actual depositada
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback y Envío -->
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="text-xs text-slate-400 text-center sm:text-left">
+                                <span class="text-blue-400 font-bold">¡Tip matemático!</span> Encuentra primero la constante de proporcionalidad directa $k_1 = y/x$.
+                            </div>
+                            <button onclick="verifyMission1()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-cyber font-bold rounded-lg tracking-wider transition w-full sm:w-auto">
+                                ACTIVAR ESCUDO
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FASE II: VÁLVULAS DE EXTRACCIÓN -->
+                    <div id="pane-m2" class="mission-card rounded-xl p-6 h-full flex flex-col justify-between hidden">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-emerald-950 text-emerald-400 text-xs font-cyber border border-emerald-500/30 rounded-full font-bold uppercase tracking-wider">Fase II: Proporcionalidad Inversa</span>
+                                <span class="text-xs text-slate-400">OBJETIVO: DISIPAR GAS RADIOCONTAMINADO</span>
+                            </div>
+                            
+                            <h2 class="text-2xl font-cyber text-white font-bold mb-3">Las Válvulas de Extracción</h2>
+                            <p class="text-sm text-slate-300 mb-4">
+                                Se ha detectado una fuga menor de vapor pesado. Para entrar a la sala de control final, debemos vaciar la cámara hermética. Según los sensores, disponemos de exactamente <strong class="text-yellow-400 font-cyber">15 minutos</strong> antes de que la presión de los gases destruya el reactor. ¿Cuántas válvulas de succión idénticas deben activarse en paralelo?
+                            </p>
+
+                            <!-- Zona de Cálculo mental para estudiantes -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/50 p-4 rounded-lg border border-slate-800 mb-6 text-sm">
+                                <div>
+                                    <span class="text-xs text-slate-400 block uppercase">Fórmula de apoyo:</span>
+                                    <p class="font-bold text-slate-300 mb-1">Si $y$ (tiempo) es Inversamente Proporcional a $x$ (válvulas):</p>
+                                    <p class="text-yellow-500 font-bold text-lg mt-1">$y = \frac{k}{x}$ &nbsp;&nbsp; o &nbsp;&nbsp; $k = x \cdot y$</p>
+                                </div>
+                                <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-4 flex flex-col justify-center">
+                                    <span class="text-xs text-slate-400 block uppercase">Datos conocidos:</span>
+                                    <p class="text-slate-300 font-semibold">Válvulas ($x_1$) = 3 &rarr; Tiempo ($y_1$) = 40 min</p>
+                                    <p class="text-emerald-400 font-semibold">¿Válvulas ($x_2$) = ? &rarr; Tiempo ($y_2$) = 15 min</p>
+                                </div>
+                            </div>
+
+                            <!-- Panel de Válvulas Interactivas -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                                <span class="text-xs text-slate-400 block mb-4 uppercase tracking-wider">Haga clic en los interruptores para activar/desactivar las válvulas:</span>
+                                <div class="grid grid-cols-5 gap-3 max-w-sm mx-auto">
+                                    <button onclick="toggleValve(1)" id="valve-1" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-01
+                                    </button>
+                                    <button onclick="toggleValve(2)" id="valve-2" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-02
+                                    </button>
+                                    <button onclick="toggleValve(3)" id="valve-3" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-03
+                                    </button>
+                                    <button onclick="toggleValve(4)" id="valve-4" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-04
+                                    </button>
+                                    <button onclick="toggleValve(5)" id="valve-5" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-05
+                                    </button>
+                                    <button onclick="toggleValve(6)" id="valve-6" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-06
+                                    </button>
+                                    <button onclick="toggleValve(7)" id="valve-7" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-07
+                                    </button>
+                                    <button onclick="toggleValve(8)" id="valve-8" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-08
+                                    </button>
+                                    <button onclick="toggleValve(9)" id="valve-9" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-09
+                                    </button>
+                                    <button onclick="toggleValve(10)" id="valve-10" class="py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs">
+                                        <i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>
+                                        V-10
+                                    </button>
+                                </div>
+                                <div class="mt-4 text-xs text-slate-400">
+                                    Válvulas activas: <span id="valve-count" class="text-emerald-400 font-bold font-cyber text-sm">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback y Envío -->
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="text-xs text-slate-400 text-center sm:text-left">
+                                <span class="text-emerald-400 font-bold">¡Tip matemático!</span> Encuentra la constante de proporcionalidad inversa $k_2 = x \cdot y$.
+                            </div>
+                            <button onclick="verifyMission2()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-cyber font-bold rounded-lg tracking-wider transition w-full sm:w-auto">
+                                EXTRACCIÓN DE GASES
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FASE III: LÁSER DE ENFOQUE -->
+                    <div id="pane-m3" class="mission-card rounded-xl p-6 h-full flex flex-col justify-between hidden">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-purple-950 text-purple-400 text-xs font-cyber border border-purple-500/30 rounded-full font-bold uppercase tracking-wider">Fase III: Proporcionalidad Directa (Decimales)</span>
+                                <span class="text-xs text-slate-400">OBJETIVO: CALIBRAR RAYO LÁSER</span>
+                            </div>
+                            
+                            <h2 class="text-2xl font-cyber text-white font-bold mb-3">El Láser de Enfoque</h2>
+                            <p class="text-sm text-slate-300 mb-4">
+                                El enfriador central requiere un disparo de energía lumínica muy preciso para perforar las placas térmicas del reactor. Los sensores demandan una energía de exactamente <strong class="text-yellow-400 font-cyber">400 microjulios ($\mu$J)</strong>. Ajusta el ancho de pulso en milisegundos ($ms$) para emitir esa potencia exacta.
+                            </p>
+
+                            <!-- Zona de Cálculo mental para estudiantes -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/50 p-4 rounded-lg border border-slate-800 mb-6 text-sm">
+                                <div>
+                                    <span class="text-xs text-slate-400 block uppercase">Fórmula de apoyo:</span>
+                                    <p class="font-bold text-slate-300 text-slate-100 mb-1">Si $y$ (energía) es Directamente Proporcional a $x$ (ancho de pulso):</p>
+                                    <p class="text-yellow-500 font-bold text-lg mt-1">$y = k \cdot x$ &nbsp;&nbsp; o &nbsp;&nbsp; $k = \frac{y}{x}$</p>
+                                </div>
+                                <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-4 flex flex-col justify-center">
+                                    <span class="text-xs text-slate-400 block uppercase">Datos conocidos:</span>
+                                    <p class="text-slate-300 font-semibold">Ancho ($x_1$) = 2.5 ms &rarr; Energía ($y_1$) = 80 $\mu$J</p>
+                                    <p class="text-purple-400 font-semibold">¿Ancho ($x_2$) = ? &rarr; Energía ($y_2$) = 400 $\mu$J</p>
+                                </div>
+                            </div>
+
+                            <!-- Simulador Interactivo: Slider del Láser -->
+                            <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 text-center space-y-4">
+                                <span class="text-xs text-slate-400 block uppercase tracking-wider">Control de frecuencia y ancho de pulso:</span>
+                                
+                                <div class="flex items-center justify-center gap-6 py-2">
+                                    <button onclick="adjustLaser(-1)" class="w-12 h-12 bg-slate-900 hover:bg-slate-800 border border-purple-500/30 text-purple-400 rounded-lg flex items-center justify-center font-bold font-cyber text-lg transition">-1</button>
+                                    <button onclick="adjustLaser(-0.1)" class="w-12 h-12 bg-slate-900 hover:bg-slate-800 border border-purple-500/30 text-purple-400 rounded-lg flex items-center justify-center font-bold font-cyber text-sm transition">-0.1</button>
+                                    
+                                    <div class="bg-slate-900 border-2 border-purple-500 px-6 py-3 rounded-lg min-w-[140px] text-center shadow-lg">
+                                        <span class="text-xs text-purple-400 block font-cyber">ANCHO DE PULSO</span>
+                                        <span id="laser-value" class="text-2xl font-bold font-cyber text-slate-100">5.0</span>
+                                        <span class="text-xs text-slate-400"> ms</span>
+                                    </div>
+
+                                    <button onclick="adjustLaser(0.1)" class="w-12 h-12 bg-slate-900 hover:bg-slate-800 border border-purple-500/30 text-purple-400 rounded-lg flex items-center justify-center font-bold font-cyber text-sm transition">+0.1</button>
+                                    <button onclick="adjustLaser(1)" class="w-12 h-12 bg-slate-900 hover:bg-slate-800 border border-purple-500/30 text-purple-400 rounded-lg flex items-center justify-center font-bold font-cyber text-lg transition">+1</button>
+                                </div>
+                                
+                                <div class="text-xs text-slate-500">
+                                    Rango de calibración óptico admitido: de 1.0 ms a 20.0 ms.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback y Envío -->
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="text-xs text-slate-400 text-center sm:text-left">
+                                <span class="text-purple-400 font-bold">¡Tip matemático!</span> Encuentra el valor de $k_3$ dividiendo el término de energía por la masa o ancho del manual.
+                            </div>
+                            <button onclick="verifyMission3()" class="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-cyber font-bold rounded-lg tracking-wider transition w-full sm:w-auto">
+                                DISPARAR HAZ COHERENTE
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FASE IV: BOMBAS DE REFRIGERACIÓN -->
+                    <div id="pane-m4" class="mission-card rounded-xl p-6 h-full flex flex-col justify-between hidden">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-orange-950 text-orange-400 text-xs font-cyber border border-orange-500/30 rounded-full font-bold uppercase tracking-wider">Fase IV: Proporcionalidad Inversa</span>
+                                <span class="text-xs text-slate-400">OBJETIVO: ENFRIAMIENTO DEL NÚCLEO</span>
+                            </div>
+                            
+                            <h2 class="text-2xl font-cyber text-white font-bold mb-3">Bombas de Refrigeración</h2>
+                            <p class="text-sm text-slate-300 mb-4">
+                                La temperatura del reactor está subiendo de manera descontrolada. El termostato de emergencia indica que debemos enfriarlo en exactamente <strong class="text-yellow-400 font-cyber">10 minutos</strong> para evitar que colapsen los transistores eléctricos. ¿Cuántas bombas de agua criogénica debemos activar?
+                            </p>
+
+                            <!-- Zona de Cálculo mental para estudiantes -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/50 p-4 rounded-lg border border-slate-800 mb-6 text-sm">
+                                <div>
+                                    <span class="text-xs text-slate-400 block uppercase">Fórmula de apoyo:</span>
+                                    <p class="font-bold text-slate-300 mb-1">Si $y$ (tiempo) es Inversamente Proporcional a $x$ (bombas):</p>
+                                    <p class="text-yellow-500 font-bold text-lg mt-1">$y = \frac{k}{x}$ &nbsp;&nbsp; o &nbsp;&nbsp; $k = x \cdot y$</p>
+                                </div>
+                                <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-4 flex flex-col justify-center">
+                                    <span class="text-xs text-slate-400 block uppercase">Datos conocidos:</span>
+                                    <p class="text-slate-300 font-semibold">Bombas ($x_1$) = 6 &rarr; Tiempo ($y_1$) = 15 min</p>
+                                    <p class="text-orange-400 font-semibold">¿Bombas ($x_2$) = ? &rarr; Tiempo ($y_2$) = 10 min</p>
+                                </div>
+                            </div>
+
+                            <!-- Panel de Bombas Interactivas -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                                <span class="text-xs text-slate-400 block mb-4 uppercase tracking-wider">Haga clic sobre los motores para conectar las bombas de refrigeración:</span>
+                                <div class="grid grid-cols-4 gap-3 max-w-md mx-auto">
+                                    <button onclick="togglePump(1)" id="pump-1" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-1
+                                    </button>
+                                    <button onclick="togglePump(2)" id="pump-2" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-2
+                                    </button>
+                                    <button onclick="togglePump(3)" id="pump-3" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-3
+                                    </button>
+                                    <button onclick="togglePump(4)" id="pump-4" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-4
+                                    </button>
+                                    <button onclick="togglePump(5)" id="pump-5" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-5
+                                    </button>
+                                    <button onclick="togglePump(6)" id="pump-6" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-6
+                                    </button>
+                                    <button onclick="togglePump(7)" id="pump-7" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-7
+                                    </button>
+                                    <button onclick="togglePump(8)" id="pump-8" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-8
+                                    </button>
+                                    <button onclick="togglePump(9)" id="pump-9" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-9
+                                    </button>
+                                    <button onclick="togglePump(10)" id="pump-10" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-10
+                                    </button>
+                                    <button onclick="togglePump(11)" id="pump-11" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-11
+                                    </button>
+                                    <button onclick="togglePump(12)" id="pump-12" class="py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs">
+                                        <i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-12
+                                    </button>
+                                </div>
+                                <div class="mt-4 text-xs text-slate-400">
+                                    Bombas operando: <span id="pump-count" class="text-orange-400 font-bold font-cyber text-sm">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback y Envío -->
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="text-xs text-slate-400 text-center sm:text-left">
+                                <span class="text-orange-400 font-bold">¡Tip matemático!</span> Encuentra el valor de la constante de proporcionalidad inversa $k_4 = x \cdot y$.
+                            </div>
+                            <button onclick="verifyMission4()" class="px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-cyber font-bold rounded-lg tracking-wider transition w-full sm:w-auto">
+                                BOMBEAR LÍQUIDO REFRIGERANTE
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FASE V: APAGADO FINAL -->
+                    <div id="pane-m5" class="mission-card rounded-xl p-6 h-full flex flex-col justify-between hidden">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-red-950 text-red-400 text-xs font-cyber border border-red-500/30 rounded-full font-bold uppercase tracking-wider">Fase Final: Desactivación</span>
+                                <span class="text-xs text-slate-400">SISTEMA CONTROLADOR</span>
+                            </div>
+                            
+                            <h2 class="text-2xl font-cyber text-white font-bold mb-3">Las Constantes del Núcleo</h2>
+                            <p class="text-sm text-slate-300 mb-4">
+                                El mainframe central del reactor requiere el código de desactivación total de seguridad. El Dr. Constant diseñó este cifrado combinando los valores numéricos de las cuatro constantes de proporcionalidad física estimadas en las misiones anteriores.
+                            </p>
+
+                            <!-- Las cuatro preguntas para el código de seguridad -->
+                            <div class="space-y-4 mb-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                                        <label class="block text-xs text-slate-400 mb-2 uppercase">
+                                            1. Constante directa del Escudo (<strong class="text-blue-400">$k_1$</strong>)
+                                        </label>
+                                        <input type="number" id="input-k1" placeholder="Ej. 2.5" step="0.1" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-yellow-400 font-cyber focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    </div>
+
+                                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                                        <label class="block text-xs text-slate-400 mb-2 uppercase">
+                                            2. Constante inversa del Gas (<strong class="text-emerald-400">$k_2$</strong>)
+                                        </label>
+                                        <input type="number" id="input-k2" placeholder="Ej. 80" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-yellow-400 font-cyber focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                                    </div>
+
+                                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                                        <label class="block text-xs text-slate-400 mb-2 uppercase">
+                                            3. Constante directa del Haz Láser (<strong class="text-purple-400">$k_3$</strong>)
+                                        </label>
+                                        <input type="number" id="input-k3" placeholder="Ej. 15" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-yellow-400 font-cyber focus:outline-none focus:ring-1 focus:ring-purple-500">
+                                    </div>
+
+                                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                                        <label class="block text-xs text-slate-400 mb-2 uppercase">
+                                            4. Constante inversa de Refrigeración (<strong class="text-orange-400">$k_4$</strong>)
+                                        </label>
+                                        <input type="number" id="input-k4" placeholder="Ej. 100" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-yellow-400 font-cyber focus:outline-none focus:ring-1 focus:ring-orange-500">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback y Envío -->
+                        <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="text-xs text-red-400 flex items-center gap-1">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i> Un error en las constantes de seguridad bloqueará permanentemente el acceso del mainframe.
+                            </div>
+                            <button onclick="verifyMission5()" class="px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-cyber font-bold rounded-lg tracking-widest transition w-full sm:w-auto shadow-[0_4px_15px_rgba(220,38,38,0.3)]">
+                                DETENER REACTOR
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PANTALLA DE VICTORIA -->
+        <section id="screen-win" class="hidden mission-card rounded-xl p-8 max-w-2xl mx-auto text-center border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
+            <div class="inline-flex p-4 bg-emerald-950/50 rounded-full border border-emerald-500/30 mb-6">
+                <i data-lucide="party-popper" class="w-16 h-16 text-emerald-400"></i>
+            </div>
+            <h2 class="text-3xl font-cyber font-black tracking-wider text-emerald-400 mb-2">SISTEMA APAGADO CON ÉXITO</h2>
+            <p class="text-xs text-slate-400 tracking-widest mb-6">NÚCLEO ESTABILIZADO - AMBIENTE SEGURO</p>
+            
+            <div class="bg-slate-900 p-5 rounded-lg border border-slate-800 text-left text-slate-300 text-sm space-y-3 mb-6">
+                <p>
+                    ¡Felicidades, ingenieros! Gracias a sus cálculos precisos de proporcionalidad directa e inversa, lograron reconfigurar las defensas térmicas e inyectar el refrigerante a tiempo.
+                </p>
+                <div class="border-t border-slate-800 pt-3 flex flex-col gap-2">
+                    <p class="text-slate-400 font-semibold uppercase text-xs">Resumen Técnico de la Misión:</p>
+                    <ul class="space-y-1 text-slate-300">
+                        <li>• <strong class="text-blue-400">Fase I:</strong> Escudo activo de 27 minutos requería exactamente <strong class="text-blue-400">9g</strong> de Absurdio ($k_1 = 3$).</li>
+                        <li>• <strong class="text-emerald-400">Fase II:</strong> Disipar gas tóxico en 15 minutos requería abrir exactamente <strong class="text-emerald-400">8 válvulas</strong> ($k_2 = 120$).</li>
+                        <li>• <strong class="text-purple-400">Fase III:</strong> Generar 400 $\mu$J de energía de pulso requería un ancho de <strong class="text-purple-400">12.5 ms</strong> ($k_3 = 32$).</li>
+                        <li>• <strong class="text-orange-400">Fase IV:</strong> Enfriar el núcleo en 10 minutos requería activar exactamente <strong class="text-orange-400">9 bombas</strong> ($k_4 = 90$).</li>
+                        <li>• <strong class="text-yellow-400">Cifrado de Seguridad:</strong> $k_1 = 3$, $k_2 = 120$, $k_3 = 32$ y $k_4 = 90$.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="restartGame()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-cyber font-bold rounded-lg tracking-wider transition">
+                REINICIAR EXPERIMENTO
+            </button>
+        </section>
+
+        <!-- PANTALLA DE DERROTA (TIEMPO AGOTADO) -->
+        <section id="screen-gameover" class="hidden mission-card rounded-xl p-8 max-w-2xl mx-auto text-center border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)]">
+            <div class="inline-flex p-4 bg-red-950/50 rounded-full border border-red-500/30 mb-6">
+                <i data-lucide="skull" class="w-16 h-16 text-red-500 alert-pulse"></i>
+            </div>
+            <h2 class="text-3xl font-cyber font-black tracking-wider text-red-500 mb-2">FUSIÓN NÚCLEO DETECTADA</h2>
+            <p class="text-xs text-slate-400 tracking-widest mb-6">TIEMPO LÍMITE SUPERADO - PROTOCOLO DE CONFINAMIENTO ACTIVO</p>
+            
+            <p class="text-slate-300 mb-8 text-sm leading-relaxed max-w-md mx-auto">
+                No lograron calibrar los sistemas a tiempo. El reactor ha entrado en una reacción en cadena. Recuerden revisar la relación entre variables: en la directa si una sube la otra también; en la inversa si una sube la otra decrece manteniendo un producto constante.
+            </p>
+
+            <button onclick="restartGame()" class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-cyber font-bold rounded-lg tracking-wider transition">
+                VOLVER A INTENTARLO
+            </button>
+        </section>
+
+        <!-- Modales de Notificación rápidos (Reemplazo de alert) -->
+        <div id="alert-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4">
+            <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-xl p-6 text-center shadow-2xl">
+                <div id="alert-icon-container" class="inline-flex p-3 rounded-full mb-4">
+                    <!-- Icono dinámico -->
+                </div>
+                <h4 id="alert-title" class="text-lg font-cyber font-bold mb-2">Título de alerta</h4>
+                <p id="alert-message" class="text-sm text-slate-300 mb-6">Mensaje detallado para el usuario.</p>
+                <button onclick="closeAlert()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-bold font-cyber text-sm transition">
+                    ENTENDIDO
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer / Licencia / Créditos -->
+    <footer class="border-t border-slate-900 bg-slate-950/50 py-3 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>Escape Room Virtual: Proporcionalidad Directa e Inversa</span>
+            <span>&copy; 2026 Laboratorios de Ciencias Exactas</span>
+        </div>
+    </footer>
+
+    <!-- Lógica del Juego -->
+    <script>
+        // Inicializar iconos de Lucide
+        lucide.createIcons();
+
+        // Variables de Control del Estado
+        let gameActive = false;
+        let timer = null;
+        let timeRemaining = 20 * 60; // 20 minutos en segundos
+        let currentMission = 1;
+        
+        // Estado Misión 1 (Balanza de Absurdio)
+        let currentWeight = 0;
+
+        // Estado Misión 2 (Válvulas)
+        let activeValves = new Set();
+
+        // Estado Misión 3 (Láser de Enfoque)
+        let laserPulseWidth = 5.0; // En milisegundos
+
+        // Estado Misión 4 (Bombas)
+        let activePumps = new Set();
+
+        // Inicialización y Pantallas
+        function showScreen(screenId) {
+            document.getElementById('screen-intro').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-win').classList.add('hidden');
+            document.getElementById('screen-gameover').classList.add('hidden');
+            
+            document.getElementById(screenId).classList.remove('hidden');
+            
+            // Forzar renderizado de MathJax en la pantalla activa al cambiar de pantalla
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+        }
+
+        function startGame() {
+            gameActive = true;
+            timeRemaining = 20 * 60; // Resetear tiempo a 20 minutos
+            currentMission = 1;
+            currentWeight = 0;
+            laserPulseWidth = 5.0;
+            activeValves.clear();
+            activePumps.clear();
+            
+            updateScaleDisplay();
+            updateValvesDisplay();
+            updateLaserDisplay();
+            updatePumpsDisplay();
+            resetMissionDisplays();
+            
+            showScreen('screen-game');
+            startTimer();
+        }
+
+        function restartGame() {
+            clearInterval(timer);
+            showScreen('screen-intro');
+        }
+
+        // Lógica del Cronómetro
+        function startTimer() {
+            if (timer) clearInterval(timer);
+            
+            updateTimerDisplay();
+            
+            timer = setInterval(() => {
+                if (!gameActive) return;
+                
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            const displayStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerEl = document.getElementById('countdown');
+            timerEl.textContent = displayStr;
+            
+            // Añadir efectos de pánico visual al final (menos de 2 minutos)
+            if (timeRemaining < 120) {
+                timerEl.classList.add('text-red-600', 'alert-pulse');
+            } else {
+                timerEl.classList.remove('text-red-600');
+            }
+        }
+
+        function endGame(victory) {
+            gameActive = false;
+            clearInterval(timer);
+            if (victory) {
+                showScreen('screen-win');
+            } else {
+                showScreen('screen-gameover');
+            }
+        }
+
+        // Sistema de Notificaciones Personalizado
+        function showAlert(title, message, type = 'info') {
+            const modal = document.getElementById('alert-modal');
+            const iconContainer = document.getElementById('alert-icon-container');
+            const titleEl = document.getElementById('alert-title');
+            const msgEl = document.getElementById('alert-message');
+            
+            // Limpiar clases previas
+            iconContainer.className = "inline-flex p-3 rounded-full mb-4";
+            
+            if (type === 'success') {
+                iconContainer.classList.add('bg-emerald-950/50', 'border', 'border-emerald-500/30', 'text-emerald-400');
+                iconContainer.innerHTML = `<i data-lucide="check-circle" class="w-8 h-8"></i>`;
+                titleEl.className = "text-lg font-cyber font-bold mb-2 text-emerald-400";
+            } else if (type === 'error') {
+                iconContainer.classList.add('bg-red-950/50', 'border', 'border-red-500/30', 'text-red-400');
+                iconContainer.innerHTML = `<i data-lucide="x-circle" class="w-8 h-8"></i>`;
+                titleEl.className = "text-lg font-cyber font-bold mb-2 text-red-500";
+            } else {
+                iconContainer.classList.add('bg-blue-950/50', 'border', 'border-blue-500/30', 'text-blue-400');
+                iconContainer.innerHTML = `<i data-lucide="info" class="w-8 h-8"></i>`;
+                titleEl.className = "text-lg font-cyber font-bold mb-2 text-blue-400";
+            }
+            
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+            
+            // Procesar fórmulas matemáticas dentro del modal si existieran
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise([modal]);
+            }
+        }
+
+        function closeAlert() {
+            document.getElementById('alert-modal').classList.add('hidden');
+        }
+
+        // LÓGICA DE LA MISIÓN 1: BALANZA DE ABSURDIO (PROP. DIRECTA)
+        function addMineral(weight) {
+            currentWeight += weight;
+            updateScaleDisplay();
+        }
+
+        function clearMinerals() {
+            currentWeight = 0;
+            updateScaleDisplay();
+        }
+
+        function updateScaleDisplay() {
+            document.getElementById('scale-display').innerHTML = `${currentWeight.toFixed(2)} <span class="text-sm">g</span>`;
+        }
+
+        function verifyMission1() {
+            if (Math.abs(currentWeight - 9) < 0.01) {
+                showAlert(
+                    "¡CÁLCULO CORRECTO!", 
+                    "Has calibrado el peso del Absurdio de forma perfecta. El escudo de fusión del reactor se ha desplegado durante exactamente 27 minutos. ¡Anota la constante de proporcionalidad $k_1$ que usaste! Accediendo a la Fase II.", 
+                    "success"
+                );
+                completeMission1();
+            } else {
+                if (currentWeight < 9) {
+                    showAlert("ERROR DE CALIBRACIÓN", "El peso en la balanza es insuficiente. El escudo caerá antes del tiempo requerido exponiendo el reactor. ¡Inténtalo de nuevo!", "error");
+                } else {
+                    showAlert("PELIGRO DE SOBRECARGA", "Demasiado Absurdio en la balanza. La energía excedente podría detonar el escudo. Retira material.", "error");
+                }
+            }
+        }
+
+        function completeMission1() {
+            const st1 = document.getElementById('status-m1');
+            st1.className = "flex items-center gap-3 p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30";
+            document.getElementById('icon-m1').setAttribute('data-lucide', 'check-circle');
+            document.getElementById('icon-m1').className = "w-5 h-5 text-emerald-500";
+            
+            const st2 = document.getElementById('status-m2');
+            st2.className = "flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-emerald-500/30 cursor-pointer";
+            st2.onclick = () => selectMission(2);
+            document.getElementById('icon-m2').setAttribute('data-lucide', 'unlock');
+            document.getElementById('icon-m2').className = "w-5 h-5 text-emerald-500";
+
+            currentMission = 2;
+            selectMission(2);
+            lucide.createIcons();
+        }
+
+        // LÓGICA DE LA MISIÓN 2: VÁLVULAS DE EXTRACCIÓN (PROP. INVERSA)
+        function toggleValve(id) {
+            if (activeValves.has(id)) {
+                activeValves.delete(id);
+            } else {
+                activeValves.add(id);
+            }
+            updateValvesDisplay();
+        }
+
+        function updateValvesDisplay() {
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.getElementById(`valve-${i}`);
+                if (activeValves.has(i)) {
+                    btn.className = "py-3 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-500 rounded text-emerald-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs";
+                    btn.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> V-${i.toString().padStart(2, '0')}`;
+                } else {
+                    btn.className = "py-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex flex-col items-center gap-1 text-xs";
+                    btn.innerHTML = `<i data-lucide="circle" class="w-4 h-4 text-slate-500"></i> V-${i.toString().padStart(2, '0')}`;
+                }
+            }
+            
+            document.getElementById('valve-count').textContent = activeValves.size;
+            lucide.createIcons();
+        }
+
+        function verifyMission2() {
+            if (activeValves.size === 8) {
+                showAlert(
+                    "¡FLUJO ESTABLECIDO!", 
+                    "Con 8 válvulas succionando aire, la nube radioactiva ha sido despejada de la antesala en exactamente 15 minutos. ¡Anoten la constante de proporcionalidad $k_2$ de esta fase! Abriendo la Fase III.", 
+                    "success"
+                );
+                completeMission2();
+            } else if (activeValves.size < 8) {
+                showAlert("EXTRACCIÓN INSUFICIENTE", "Hay muy pocas válvulas abiertas. El gas no se extraerá a tiempo y comprometerá los trajes de seguridad en menos de 15 minutos. Abran más vías.", "error");
+            } else {
+                showAlert("ALERTA DE PRESIÓN", "Demasiadas válvulas de vacío abiertas en simultáneo. La diferencia de presión puede colapsar los conductos estructurales del reactor. Cierren válvulas de inmediato.", "error");
+            }
+        }
+
+        function completeMission2() {
+            const st2 = document.getElementById('status-m2');
+            st2.className = "flex items-center gap-3 p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30";
+            document.getElementById('icon-m2').setAttribute('data-lucide', 'check-circle');
+            document.getElementById('icon-m2').className = "w-5 h-5 text-emerald-500";
+            
+            const st3 = document.getElementById('status-m3');
+            st3.className = "flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-purple-500/30 cursor-pointer";
+            st3.onclick = () => selectMission(3);
+            document.getElementById('icon-m3').setAttribute('data-lucide', 'unlock');
+            document.getElementById('icon-m3').className = "w-5 h-5 text-purple-500";
+
+            currentMission = 3;
+            selectMission(3);
+            lucide.createIcons();
+        }
+
+        // LÓGICA DE LA MISIÓN 3: LÁSER DE ENFOQUE (PROP. DIRECTA DECIMALES)
+        function adjustLaser(value) {
+            laserPulseWidth = Math.max(1.0, Math.min(20.0, laserPulseWidth + value));
+            updateLaserDisplay();
+        }
+
+        function updateLaserDisplay() {
+            document.getElementById('laser-value').textContent = laserPulseWidth.toFixed(1);
+        }
+
+        function verifyMission3() {
+            if (Math.abs(laserPulseWidth - 12.5) < 0.05) {
+                showAlert(
+                    "¡LÁSER EN PARALELO!", 
+                    "Has calibrado el pulso lumínico perfectamente a 12.5 ms, emitiendo exactamente los 400 microjulios requeridos. ¡Anota la constante de proporcionalidad $k_3$ calculada! Accediendo a la Fase IV.", 
+                    "success"
+                );
+                completeMission3();
+            } else {
+                if (laserPulseWidth < 12.5) {
+                    showAlert("FALTA ENERGÍA", "La anchura de pulso introducida es insuficiente para penetrar el blindaje térmico de protección. Aumenta la duración.", "error");
+                } else {
+                    showAlert("LÁSER INESTABLE", "El ancho de pulso es demasiado alto y sobrecalentará los espejos de colimación óptica. Reduce el intervalo.", "error");
+                }
+            }
+        }
+
+        function completeMission3() {
+            const st3 = document.getElementById('status-m3');
+            st3.className = "flex items-center gap-3 p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30";
+            document.getElementById('icon-m3').setAttribute('data-lucide', 'check-circle');
+            document.getElementById('icon-m3').className = "w-5 h-5 text-emerald-500";
+            
+            const st4 = document.getElementById('status-m4');
+            st4.className = "flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-orange-500/30 cursor-pointer";
+            st4.onclick = () => selectMission(4);
+            document.getElementById('icon-m4').setAttribute('data-lucide', 'unlock');
+            document.getElementById('icon-m4').className = "w-5 h-5 text-orange-500";
+
+            currentMission = 4;
+            selectMission(4);
+            lucide.createIcons();
+        }
+
+        // LÓGICA DE LA MISIÓN 4: BOMBAS DE REFRIGERACIÓN (PROP. INVERSA)
+        function togglePump(id) {
+            if (activePumps.has(id)) {
+                activePumps.delete(id);
+            } else {
+                activePumps.add(id);
+            }
+            updatePumpsDisplay();
+        }
+
+        function updatePumpsDisplay() {
+            for (let i = 1; i <= 12; i++) {
+                const btn = document.getElementById(`pump-${i}`);
+                if (activePumps.has(i)) {
+                    btn.className = "py-2 bg-orange-950/80 hover:bg-orange-900 border-2 border-orange-500 rounded text-orange-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs";
+                    btn.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 text-orange-400"></i> B-${i}`;
+                } else {
+                    btn.className = "py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-slate-400 font-cyber font-bold transition flex items-center justify-center gap-2 text-xs";
+                    btn.innerHTML = `<i data-lucide="circle" class="w-3 h-3 text-slate-500"></i> B-${i}`;
+                }
+            }
+            
+            document.getElementById('pump-count').textContent = activePumps.size;
+            lucide.createIcons();
+        }
+
+        function verifyMission4() {
+            if (activePumps.size === 9) {
+                showAlert(
+                    "¡REFRIGERACIÓN INYECTADA!", 
+                    "Con 9 bombas activas, el refrigerante fluye a la velocidad justa para disipar el calor en exactamente 10 minutos. ¡Anota la constante de proporcionalidad $k_4$ que obtuviste! Entrando al Cripto-Mainframe.", 
+                    "success"
+                );
+                completeMission4();
+            } else if (activePumps.size < 9) {
+                showAlert("FLUJO BAJO", "No hay suficientes bombas activas. El agua tardará más de 10 minutos en circular completamente y el reactor se fundirá.", "error");
+            } else {
+                showAlert("SOBREPRESIÓN EN CONDUCTOS", "Demasiadas bombas activas. La presión hidráulica ha sobrepasado los 15 bar y amenaza con romper las válvulas de admisión criogénicas.", "error");
+            }
+        }
+
+        function completeMission4() {
+            const st4 = document.getElementById('status-m4');
+            st4.className = "flex items-center gap-3 p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30";
+            document.getElementById('icon-m4').setAttribute('data-lucide', 'check-circle');
+            document.getElementById('icon-m4').className = "w-5 h-5 text-emerald-500";
+            
+            const st5 = document.getElementById('status-m5');
+            st5.className = "flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-red-500/30 cursor-pointer";
+            st5.onclick = () => selectMission(5);
+            document.getElementById('icon-m5').setAttribute('data-lucide', 'unlock');
+            document.getElementById('icon-m5').className = "w-5 h-5 text-red-500";
+
+            currentMission = 5;
+            selectMission(5);
+            lucide.createIcons();
+        }
+
+        // LÓGICA DE LA MISIÓN 5 (CÓDIGO DE DESACTIVACIÓN FINAL)
+        function verifyMission5() {
+            const inputK1 = parseFloat(document.getElementById('input-k1').value);
+            const inputK2 = parseInt(document.getElementById('input-k2').value, 10);
+            const inputK3 = parseFloat(document.getElementById('input-k3').value);
+            const inputK4 = parseInt(document.getElementById('input-k4').value, 10);
+            
+            if (inputK1 === 3 && inputK2 === 120 && inputK3 === 32 && inputK4 === 90) {
+                endGame(true);
+            } else {
+                showAlert(
+                    "ACCESO RECHAZADO", 
+                    "Las claves criptográficas matemáticas son incorrectas o no están distribuidas en las ranuras lógicas del mainframe correspondientes.", 
+                    "error"
+                );
+            }
+        }
+
+        // Selector general de pestañas de misiones (Navegación autorizada)
+        function selectMission(id) {
+            // Validaciones secuenciales de protección
+            if (id === 2 && !document.getElementById('status-m2').className.includes('border-emerald-500') && !document.getElementById('status-m2').className.includes('border-slate-950')) return;
+            if (id === 3 && !document.getElementById('status-m3').className.includes('border-purple-500') && !document.getElementById('status-m3').className.includes('border-emerald-500')) return;
+            if (id === 4 && !document.getElementById('status-m4').className.includes('border-orange-500') && !document.getElementById('status-m4').className.includes('border-emerald-500')) return;
+            if (id === 5 && !document.getElementById('status-m5').className.includes('border-red-500') && !document.getElementById('status-m5').className.includes('border-emerald-500')) return;
+
+            // Ocultar todos los paneles
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`pane-m${i}`).classList.add('hidden');
+            }
+
+            const activePane = document.getElementById(`pane-m${id}`);
+            activePane.classList.remove('hidden');
+            
+            // Actualizar indicador activo en menú de misiones
+            for (let i = 1; i <= 5; i++) {
+                const mapCard = document.getElementById(`status-m${i}`);
+                if (i === id) {
+                    mapCard.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2', 'ring-offset-slate-950');
+                } else {
+                    mapCard.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2', 'ring-offset-slate-950');
+                }
+            }
+
+            // Forzar renderizado de MathJax exclusivamente para el panel que se acaba de mostrar
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise([activePane]);
+            }
+        }
+
+        function resetMissionDisplays() {
+            const st1 = document.getElementById('status-m1');
+            st1.className = "flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-blue-500/30";
+            st1.onclick = () => selectMission(1);
+            document.getElementById('icon-m1').setAttribute('data-lucide', 'lock');
+            document.getElementById('icon-m1').className = "w-5 h-5 text-slate-500";
+
+            for (let i = 2; i <= 5; i++) {
+                const st = document.getElementById(`status-m${i}`);
+                st.className = "flex items-center gap-3 p-3 rounded-lg bg-slate-950 border border-slate-800 opacity-60";
+                st.onclick = null;
+                document.getElementById(`icon-m${i}`).setAttribute('data-lucide', 'lock');
+                document.getElementById(`icon-m${i}`).className = "w-5 h-5 text-slate-500";
+            }
+
+            // Limpiar inputs
+            document.getElementById('input-k1').value = '';
+            document.getElementById('input-k2').value = '';
+            document.getElementById('input-k3').value = '';
+            document.getElementById('input-k4').value = '';
+
+            // Mostrar el primer panel
+            selectMission(1);
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
